@@ -68,7 +68,6 @@ module.exports = {
       const filter = { _id: req.params.userId };
       const update = { $push: { friends: req.params.friendId } };
       const user = await User.findOneAndUpdate(filter, update);
-      console.log(req.params.friendId);
       res.json(user);
     } catch (err) {
       console.log(err);

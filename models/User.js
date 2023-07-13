@@ -15,7 +15,7 @@ const userShema = new Schema(
         message: (v) => `${v.value} is not a valid email.`,
       },
     },
-    thoughts: [thoughtSchema.schema],
+    thoughts: { type: Array },
     friends: [this],
   },
   {
@@ -28,6 +28,10 @@ const userShema = new Schema(
 
 userShema.virtual("friendCount").get(function () {
   return this.friends.length;
+});
+
+userShema.post("findOneAndDelete", async (data) => {
+  console.log(JSON.stringify(data));
 });
 
 const User = model("user", userShema);
