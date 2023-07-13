@@ -7,10 +7,16 @@ const userShema = new Schema(
     email: {
       type: String,
       required: true,
-      validate: { unique: true, match: /.+\@.+\..+/ },
+      unique: true,
+      validate: {
+        validator: (v) => {
+          return /.+\@.+\..+/.test(v);
+        },
+        message: (v) => `${v.value} is not a valid email.`,
+      },
     },
-    thoughts: [thoughtSchema],
-    friends: [userShema],
+    thoughts: [thoughtSchema.schema],
+    friends: [this],
   },
   {
     toJSON: {
