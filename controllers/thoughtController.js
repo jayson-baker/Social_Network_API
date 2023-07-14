@@ -1,4 +1,4 @@
-const { Thought, User } = require("../models");
+const { Thought, User, Reaction } = require("../models");
 
 module.exports = {
   async getThoughts(req, res) {
@@ -6,6 +6,7 @@ module.exports = {
       const thought = await Thought.find();
       res.json(thought);
     } catch (err) {
+      console.log(err);
       res.status(500).json(err);
     }
   },
@@ -21,6 +22,7 @@ module.exports = {
 
       res.json(thought);
     } catch (err) {
+      console.log(err);
       res.status(500).json(err);
     }
   },
@@ -39,7 +41,7 @@ module.exports = {
   async deleteThought(req, res) {
     try {
       const thought = await Thought.findOneAndDelete({
-        _id: req.params.userId,
+        _id: req.params.thoughtId,
       });
 
       if (!thought) {
@@ -62,6 +64,40 @@ module.exports = {
         return res.status(404).json({ message: "No thought with that ID" });
       }
 
+      res.json(thought);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json(err);
+    }
+  },
+  async deleteReaction(req, res) {
+    try {
+      const filter = { _id: req.params.thoughtId };
+      const thought = await Thought.findOne(filter);
+      const newThoughtArray = thought.reactions.filter((reaction) => {
+        if (reaction.reactionId?.toString() === req.body.reactionId) {
+          return false;
+        }
+        return true;
+      });
+      const updatedThought = await Thought.findOneAndUpdate(filter, {
+        reactions: newThoughtArray,
+      });
+      console.log(newThoughtArray);
+      console.log(thought.reactions);
+      res.json({ message: "Reaction has been deleted!" });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json(err);
+    }
+  },
+  async addReaction(req, res) {
+    try {
+      const myReaction = new Reaction(req.body);
+      console.log(myReaction);
+      const filter = { _id: req.params.thoughtId };
+      const update = { $push: { reactions: myReaction } };
+      const thought = await Thought.findOneAndUpdate(filter, update);
       res.json(thought);
     } catch (err) {
       console.log(err);
